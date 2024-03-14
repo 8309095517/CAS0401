@@ -1,0 +1,52 @@
+#include <stdio.h>
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+void sortBurstTime(int n, int burstTime[], int process[]) {
+    int i, j;
+    for (i = 0; i < n; i++) {
+        for (j = i + 1; j < n; j++) {
+            if (burstTime[i] > burstTime[j]) {
+                swap(&burstTime[i], &burstTime[j]);
+                swap(&process[i], &process[j]);
+            }
+        }
+    }
+}
+void calculateWaitingTime(int n, int burstTime[], int waitingTime[]) {
+    waitingTime[0] = 0; 
+    for (int i = 1; i < n; i++) {
+        waitingTime[i] = burstTime[i - 1] + waitingTime[i - 1];
+    }
+}
+void calculateTurnAroundTime(int n, int burstTime[], int waitingTime[], int turnAroundTime[]) {
+    for (int i = 0; i < n; i++) {
+        turnAroundTime[i] = burstTime[i] + waitingTime[i];
+    }
+}
+void calculateAverageTime(int n, int burstTime[]) {
+    int waitingTime[n], turnAroundTime[n], totalWaitingTime = 0, totalTurnAroundTime = 0;
+    int process[n];
+    for (int i = 0; i < n; i++) {
+        process[i] = i + 1;
+    }
+    sortBurstTime(n, burstTime, process);
+    calculateWaitingTime(n, burstTime, waitingTime);
+    calculateTurnAroundTime(n, burstTime, waitingTime, turnAroundTime);
+    printf("Process\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        totalWaitingTime += waitingTime[i];
+        totalTurnAroundTime += turnAroundTime[i];
+        printf("%d\t\t%d\t\t%d\t\t%d\n", process[i], burstTime[i], waitingTime[i], turnAroundTime[i]);
+    }
+    printf("Average waiting time = %.2f\n", (float)totalWaitingTime / (float)n);
+    printf("Average turn around time = %.2f\n", (float)totalTurnAroundTime / (float)n);
+}
+int main() {
+    int n = 4; 
+    int burstTime[] = {2, 3, 8, 6};
+    calculateAverageTime(n, burstTime);
+    return 0;
+}
